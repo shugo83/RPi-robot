@@ -24,7 +24,8 @@ def gpio_open():
 
 	GPIO.setup(TRIG2,GPIO.OUT)
 	GPIO.setup(ECHO2,GPIO.IN)
-
+	pins=[26,19,13,6,5,11,12,9,10,22]
+	GPIO.setup(pins, GPIO.OUT)
 def leds(inp):
 	pins=[26,19,13,6]
 	if len(inp)!=4:
