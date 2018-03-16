@@ -56,7 +56,7 @@ def measure():
 	time.sleep(0.00001)
 	GPIO.output(TRIG,False)
 
-	
+
 	count=0
 	pulse_start = time.time()
 	while GPIO.input(ECHO)==0:
@@ -122,74 +122,72 @@ def measure2():
 
 	return distance
 
+
 def gpio_close():
 		GPIO.cleanup()
 
-def motor(power1,power2):
-	global pwm1
-	global pwm2
-	motor1A = 23	#Input A
-	motor1B = 24	#Input B
-	motor1E = 18		#PWM
 
-	motor2A = 16
-	motor2B = 20
-	motor2E = 21
+def motor(power1, power2):
+    global pwm1
+    global pwm2
+    motor1A = 23	  # Input A
+    motor1B = 24	  # Input B
+    motor1E = 18	  # PWM
 
-	fd1=True
-	fd0=False
-	fd1=False
+    motor2A = 16
+    motor2B = 20
+    motor2E = 21
 
-	if power1>0:
-		fd0=True
+    fd1 = True
+    fd0 = False
+    fd1 = False
 
-	if power2>0:
-		fd1=True
+    if power1 > 0:
+        fd0 = True
 
+    if power2 > 0:
+        fd1 = True
 
-	#setup pins
-	GPIO.setup(motor1A,GPIO.OUT)
-	GPIO.setup(motor1B,GPIO.OUT)
-	GPIO.setup(motor1E,GPIO.OUT)
+    # setup pins
+    GPIO.setup(motor1A, GPIO.OUT)
+    GPIO.setup(motor1B, GPIO.OUT)
+    GPIO.setup(motor1E, GPIO.OUT)
 
-	GPIO.setup(motor2A,GPIO.OUT)
-	GPIO.setup(motor2B,GPIO.OUT)
-	GPIO.setup(motor2E,GPIO.OUT)
+    GPIO.setup(motor2A, GPIO.OUT)
+    GPIO.setup(motor2B, GPIO.OUT)
+    GPIO.setup(motor2E, GPIO.OUT)
 
 	#motor0
 
+    pwm1 = GPIO.PWM(motor1E, 100)
 
-	pwm1 = GPIO.PWM(motor1E,100)
-
-	if fd0 == True:
-		GPIO.output(motor1A,GPIO.HIGH)
-		GPIO.output(motor1B,GPIO.LOW)
-		GPIO.output(motor1E,GPIO.HIGH)
-	else:
-		GPIO.output(motor1A,GPIO.LOW)
-		GPIO.output(motor1B,GPIO.HIGH)
-		GPIO.output(motor1E,GPIO.HIGH)
+    if fd0 is True:
+        GPIO.output(motor1A, GPIO.HIGH)
+        GPIO.output(motor1B, GPIO.LOW)
+        GPIO.output(motor1E, GPIO.HIGH)
+    else:
+        GPIO.output(motor1A, GPIO.LOW)
+        GPIO.output(motor1B, GPIO.HIGH)
+        GPIO.output(motor1E, GPIO.HIGH)
 
 
 	#motor1
 
 
-	pwm2 = GPIO.PWM(motor2E,100)
+    pwm2 = GPIO.PWM(motor2E, 100)
 
+    fd1 = not fd1
+    if fd1 is True:
+        GPIO.output(motor2A, GPIO.HIGH)
+        GPIO.output(motor2B, GPIO.LOW)
+        GPIO.output(motor2E, GPIO.HIGH)
+    else:
+        GPIO.output(motor2A, GPIO.LOW)
+        GPIO.output(motor2B, GPIO.HIGH)
+        GPIO.output(motor2E, GPIO.HIGH)
 
-	fd1 = not fd1 
-	if fd1 == True:
-
-		GPIO.output(motor2A,GPIO.HIGH)
-		GPIO.output(motor2B,GPIO.LOW)
-		GPIO.output(motor2E,GPIO.HIGH)
-	else:
-		GPIO.output(motor2A,GPIO.LOW)
-		GPIO.output(motor2B,GPIO.HIGH)
-		GPIO.output(motor2E,GPIO.HIGH)
-
-	pwm1.start(abs(power1))
-	pwm2.start(abs(power2))
+    pwm1.start(abs(power1))
+    pwm2.start(abs(power2))
 
 
 
