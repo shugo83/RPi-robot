@@ -23,18 +23,18 @@ from PIL import ImageStat
 ####camera.framerate=10
 
 format_string = '%(levelname)8s:\t%(module)-8s \t%(funcName)15s \t%(message)s'
-logging.basicConfig(format=format_string, level=logging.DEBUG)
+logging.basicConfig(filename='log_file.log', format=format_string, level=logging.DEBUG)
 logging.info('Logging sys active')
 old_power1 = 0.0
 old_power2 = 0.0
 
 count = 0
-critical = 10
-safe = 20
+critical = 15
+safe = 30
 
 last_dist = []
 
-threshold = 150
+##threshold = 150
 
 pwm1=None
 pwm2=None
@@ -46,6 +46,30 @@ ECHO2 = 11
 
 
 camera = picamera.PiCamera()
+def calibrate_threshold():
+    global camera
+    global shutter_speed
+    stream = io.BytesIO()
+    camera.shutter_speed = shutter_speed
+    camera.resolution = (1296, 972)
+    camera.capture(stream, format='jpeg')
+    stream.seek(0)
+    im = Image.open(stream)
+##    im.show()  # Debug only
+    width = im.size[0]
+    centre = width/2
+    height = im.size[1]
+    crop = im.crop((centre - 100, height - 400, centre + 100, height))
+    gray = ImageOps.grayscale(crop)
+    gray_mean = ImageStat.Stat(gray).mean[0]
+    if gray_mean + 20 < 200:
+        threshold = gray_mean + 20
+        leds([False, False, True, True, True, False, False, False, False, False])
+    else:
+        threshold = 200
+        leds([False, False, True, True, False, True, True, False, True, True])
+    return threshold
+
 
 def gpio_open():
     '''Initialise GPIO'''
@@ -266,18 +290,18 @@ def image_to_array(im):
 def scan(safe, critical):
     '''Rotate and record directions'''
     polar_array = []  # idea for dev
-    motor_for_time(-50, 0, 1)
+    motor_for_time(-100, 0, 0.25)
     rotate = True
     while rotate is True:
         dist = measure()
         logging.info(str(dist))
         if dist < safe:
-            motor_for_time(25, 0, 0.5)
+            motor_for_time(100, 0, 0.2)
             logging.info('Not safe')
             leds([False, False, False, False, False, False, False, True, True, False])
             rotate = True
         elif dist < critical:
-            motor_for_time(-50, -50, 0.5)
+            motor_for_time(-100, -100, 0.2)
             logging.info('Critical Distance')
             leds([False, False, False, False, False, False, True, True, True, False])
             rotate = True
@@ -349,14 +373,14 @@ def object_detection(safe,threshold):
                 image.save(fn)
             except Exception as E:
                 logging.info(E)
-            image.show()  # debug only
+##            image.show()  # debug only
             ####scan###
             scan(safe,critical)
         elif dist > safe:
             #####drive###
             leds([True, True, True, True, True, True, True, False, False, False])
             logging.info('Drive forward ' + str(dist))
-            motor_for_time(-50, -50, 0.5)
+            motor_for_time(-100, -100, 0.25)
         #### check for white paper###
         paper_check(threshold)
         time.sleep(1)  # decrease for smoother travel
@@ -368,6 +392,8 @@ gpio_open()
 logging.info('buggy autorun')
 startup()
 shutter_speed = camera_init()
+threshold = calibrate_threshold()
+logging.info('thresh : ' + str(threshold))
 logging.info(str(shutter_speed))
 clear_images()
 logging.info('Safe Distance set to: ' + str(safe))
