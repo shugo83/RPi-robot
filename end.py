@@ -1,3 +1,3 @@
 from main import motor
-
-motor(0,0)
+import RPi.GPIO as GPIO
+motor(0, 0)

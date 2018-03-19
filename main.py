@@ -262,7 +262,7 @@ def dist_smooth():
 def motor_for_time(power1, power2, time_length):
     motor(power1, power2)
     logging.info('Motor power: ' + str(power1) + ',' + str(power2))
-    logging.info('For :' + str(time_length) + 's')
+    logging.info('For: ' + str(time_length) + 's')
     time.sleep(time_length)
     motor(0, 0)
 
@@ -293,6 +293,7 @@ def scan(safe, critical):
 #    polar_array = []  # idea for dev
     motor_for_time(-100, 0, 0.25)
     rotate = True
+    time.sleep(1)
     while rotate is True:
         dist = dist_smooth()
         logging.info(str(dist))
@@ -391,7 +392,7 @@ def object_detection(safe, threshold):
         elif dist > safe:
             #####drive###
             leds([True, True, True, True, True, True, True, False, False, False])
-            logging.info('Drive forward - clear =' + str(dist))
+            logging.info('Distance = ' + str(dist))
             motor_for_time(-100, -100, 0.25)
         #### check for white paper###
         paper_check(threshold)
@@ -405,8 +406,8 @@ logging.info('Buggy system running')
 startup()
 shutter_speed = camera_init()
 threshold = calibrate_threshold()
-logging.info('Threshold set to : ' + str(threshold))
-logging.info('Shutter speed set to' + str(shutter_speed))
+logging.info('Threshold set to: ' + str(int(threshold)))
+logging.info('Shutter speed set to:' + str(shutter_speed))
 clear_images()
 logging.info('Safe Distance set to: ' + str(safe))
 logging.info('Critical Distance set to: ' + str(critical))
