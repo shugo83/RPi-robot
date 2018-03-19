@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 import os
 import sys
-from os import listdir
+#from os import listdir
 import time
 import RPi.GPIO as GPIO
 
 #from lib import leds
 
 import logging
-import shutil
+#import shutil
 import picamera
 import picamera.array
-import numpy
+#import numpy
 import io
 
 from PIL import Image
@@ -244,15 +244,17 @@ def leds(pos):
     logging.info('Led output')
 
 
-def dist_smooth(distance):
+def dist_smooth():
     '''Temporal smoothing of US sensor'''
-    if len(last_dist) < 10:
-        last_dist.append(distance)
-    else:
-        del last_dist[0]
-        last_dist.append(distance)
+    distance_array = []
+    for i in range(10):
+        distance = measure()
+        distance_array.append(distance)
+#    else:
+#        del last_dist[0]
+#        last_dist.append(distance)
 
-    avg_dist = int(sum(last_dist) / len(last_dist))
+    avg_dist = int(sum(distance_array) / len(distance_array))
 
     return avg_dist
 
@@ -292,7 +294,7 @@ def scan(safe, critical):
     motor_for_time(-100, 0, 0.25)
     rotate = True
     while rotate is True:
-        dist = measure()
+        dist = dist_smooth()
         logging.info(str(dist))
         if dist < safe:
             motor_for_time(100, 0, 0.2)
@@ -363,14 +365,14 @@ def camera_init():
     return shutter_speed
 
 
-def object_detection(safe,threshold):
+def object_detection(safe, threshold):
     '''General Navigation'''
     global count
     global critical
     searching = True
     logging.info('Navigation started')
     while searching:
-        dist = measure()
+        dist = dist_smooth()
 ##        avg_dist = dist_smooth(dist)
         if dist < safe:
             logging.info('Object detected at: ' + str(dist))
@@ -385,7 +387,7 @@ def object_detection(safe,threshold):
                 logging.info(E)
 ##            image.show()  # debug only
             ####scan###
-            scan(safe,critical)
+            scan(safe, critical)
         elif dist > safe:
             #####drive###
             leds([True, True, True, True, True, True, True, False, False, False])
