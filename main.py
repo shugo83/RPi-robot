@@ -23,7 +23,7 @@ from PIL import ImageStat
 ####camera.framerate=10
 
 format_string = '%(levelname)8s:\t%(module)-8s \t%(funcName)15s \t%(message)s'
-logging.basicConfig(filename='log_file.log', format=format_string, level=logging.DEBUG)
+logging.basicConfig(format=format_string, level=logging.DEBUG)
 logging.info('Logging sys active')
 old_power1 = 0.0
 old_power2 = 0.0
