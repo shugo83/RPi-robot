@@ -330,7 +330,7 @@ def paper_check(threshold):
     crop = im.crop((centre - 100, height - 400, centre + 100, height))
     gray = ImageOps.grayscale(crop)
     gray_mean = ImageStat.Stat(gray).mean[0]
-    logging.info(str(gray_mean))  # Debug only
+    logging.info('Brightness value = ' + str(int(gray_mean)))  # Debug only
 ##    gray.show()  # Debug only
     if int(gray_mean) > int(threshold):
         logging.info('FOUND IT')
