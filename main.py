@@ -90,7 +90,7 @@ def gpio_open():
 def gpio_close():
 		GPIO.cleanup()
 
-		
+
 def startup():
     '''Display a sequence to check leds all working'''
     leds([True, True, True, True, True, True, True, True, True, True])
@@ -114,7 +114,7 @@ def startup():
     leds([True, False, False, False, False, False, False, False, False, False])
     time.sleep(0.5)
     leds([False, False, False, False, False, False, False, False, False, False])
-    time.sleep(0.5)  
+    time.sleep(0.5)
 
 
 def motor(power1, power2):
@@ -198,24 +198,23 @@ def measure():
     pulse_start = time.time()
     while GPIO.input(ECHO)==0:
         pulse_start = time.time()
-        count=count+1
-        if count>500:
+        count = count+1
+        if count > 500:
             return 500
 
-    count=0
+    count = 0
     pulse_end = time.time()
-    while GPIO.input(ECHO)==1:
+    while GPIO.input(ECHO) == 1:
         pulse_end = time.time()
-        count=count+1
-        if count>500:
+        count = count+1
+        if count > 500:
             return 500
-
 
 
     pulse_duration = pulse_end - pulse_start
     distance = pulse_duration * 17150
 
-    distance = round(distance,2)
+    distance = round(distance, 2)
 
     return distance
 
@@ -260,8 +259,8 @@ def dist_smooth(distance):
 
 def motor_for_time(power1, power2, time_length):
     motor(power1, power2)
-    logging.info('motor powered: ' + str(power1) + ',' + str(power2))
-    logging.info('power for :' + str(time_length) + 's')
+    logging.info('Motor power: ' + str(power1) + ',' + str(power2))
+    logging.info('For :' + str(time_length) + 's')
     time.sleep(time_length)
     motor(0, 0)
 
@@ -289,7 +288,7 @@ def image_to_array(im):
 
 def scan(safe, critical):
     '''Rotate and record directions'''
-    polar_array = []  # idea for dev
+#    polar_array = []  # idea for dev
     motor_for_time(-100, 0, 0.25)
     rotate = True
     while rotate is True:
@@ -310,9 +309,11 @@ def scan(safe, critical):
             leds([True, True, False, False, False, False, False, False, False, False])
             rotate = False
 
+
 def paper_check(threshold):
     global camera
     global shutter_speed
+    tic = 0
     stream = io.BytesIO()
     camera.shutter_speed = shutter_speed
     camera.resolution = (1296, 972)
@@ -332,17 +333,25 @@ def paper_check(threshold):
         logging.info('FOUND IT')
         leds([True, False, True, False, True, False, True, False, True, False])
         image = camera_capture()
-        fn = 'hit' +'.jpg'
+        fn = 'hit' + '.jpg'
         try:
             image.save(fn)
         except Exception as E:
             logging.info(E)
-        while True:
+        if tic < 10:
             leds([False, True, False, True, False, True, False, True, False, True])
             time.sleep(0.2)
             leds([True, False, True, False, True, False, True, False, True, False])
             time.sleep(0.2)
-        
+            tic += 1
+        logging.info('Continue Searching? y/n')
+        rep = input().strip()
+        if rep == 'y':
+            logging.info('Search resumed')
+            return
+        elif rep == 'n':
+            logging.info('Quiting')
+            sys.exit()
 
 
 def camera_init():
@@ -350,7 +359,7 @@ def camera_init():
 ##    camera.iso = 200
     time.sleep(2)  # allow agc to settle
     shutter_speed = camera.exposure_speed
-    logging.info('Shutter speed: ' + str(shutter_speed))
+    logging.info('Camera init')
     return shutter_speed
 
 
@@ -359,15 +368,16 @@ def object_detection(safe,threshold):
     global count
     global critical
     searching = True
-    logging.info('searching')
+    logging.info('Navigation started')
     while searching:
         dist = measure()
 ##        avg_dist = dist_smooth(dist)
         if dist < safe:
-            logging.info('Object detected')
+            logging.info('Object detected at: ' + str(dist))
             leds([False, False, False, False, False, False, False, True, False, False])
             image = camera_capture()
             fn = 'obj_' + str(count) + '.jpg'
+            logging.info('Image saved')
             count += 1
             try:
                 image.save(fn)
@@ -379,7 +389,7 @@ def object_detection(safe,threshold):
         elif dist > safe:
             #####drive###
             leds([True, True, True, True, True, True, True, False, False, False])
-            logging.info('Drive forward ' + str(dist))
+            logging.info('Drive forward - clear =' + str(dist))
             motor_for_time(-100, -100, 0.25)
         #### check for white paper###
         paper_check(threshold)
@@ -389,12 +399,12 @@ def object_detection(safe,threshold):
 
 
 gpio_open()
-logging.info('buggy autorun')
+logging.info('Buggy system running')
 startup()
 shutter_speed = camera_init()
 threshold = calibrate_threshold()
-logging.info('thresh : ' + str(threshold))
-logging.info(str(shutter_speed))
+logging.info('Threshold set to : ' + str(threshold))
+logging.info('Shutter speed set to' + str(shutter_speed))
 clear_images()
 logging.info('Safe Distance set to: ' + str(safe))
 logging.info('Critical Distance set to: ' + str(critical))
