@@ -267,7 +267,8 @@ def leds(pos):
 
     for i in range(0, len(pins)):
         GPIO.output(pins[i], pos[i])
-    logging.info('Led output')
+
+    logging.debug('Led output')
 
 
 def dist_smooth():
@@ -292,6 +293,7 @@ def motor_for_time(power1, power2, time_length):
     time.sleep(time_length)
     motor(0, 0)
     time.sleep(0.5)
+
     logging.info('Cycle ended')
 
 
@@ -327,13 +329,13 @@ def scan(safe, critical):
         logging.info('Distance = ' + str(dist))
         if dist < safe:
             motor_for_time(100, -100, 0.2)
-            logging.info('Not safe')
+            logging.warning('Not safe')
             time.sleep(0.2)
             leds([False, False, False, False, False, False, False, True, True, False])
             rotate = True
         elif dist < critical:
             motor_for_time(-100, -100, 0.2)
-            logging.info('Critical Distance')
+            logging.warning('Critical Distance')
             time.sleep(0.2)
             leds([False, False, False, False, False, False, True, True, True, False])
             rotate = True
@@ -360,6 +362,7 @@ def paper_check(threshold):
     height = im.size[1]
     crop = im.crop((centre - 100, height - 400, centre + 100, height))
     gray = ImageOps.grayscale(crop)
+
     gray_mean = ImageStat.Stat(gray).mean[0]
     logging.info('Brightness value = ' + str(int(gray_mean)))  # Debug only
 ##    gray.show()  # Debug only
@@ -368,10 +371,12 @@ def paper_check(threshold):
         leds([True, False, True, False, True, False, True, False, True, False])
         image = camera_capture()
         fn = 'hit' + '.jpg'
+
         try:
             image.save(fn)
         except Exception as E:
             logging.info(E)
+
         if tic < 10:
             leds([False, True, False, True, False, True, False, True, False, True])
             time.sleep(0.2)
@@ -380,6 +385,7 @@ def paper_check(threshold):
             tic += 1
         logging.info('Continue Searching? y/n')
         rep = input().strip()
+
         if rep == 'y':
             logging.info('Search resumed')
             return
@@ -402,6 +408,7 @@ def object_detection(safe, threshold):
     global count
     global critical
     searching = True
+
     logging.info('Navigation started')
     while searching:
         dist = dist_smooth()
@@ -409,6 +416,7 @@ def object_detection(safe, threshold):
         if dist < safe:
             logging.info('Object detected at: ' + str(dist))
             leds([False, False, False, False, False, False, False, True, False, False])
+            time.sleep(0.1)
             image = camera_capture()
             fn = 'obj_' + str(count) + '.jpg'
             logging.info('Image saved')
@@ -423,6 +431,7 @@ def object_detection(safe, threshold):
         elif dist > safe:
             #####drive###
             leds([True, True, True, True, True, True, True, False, False, False])
+            time.sleep(0.1)
             logging.info('Distance = ' + str(dist))
             motor_for_time(-100, -100, 0.25)
         #### check for white paper###
@@ -440,7 +449,7 @@ startup()
 shutter_speed = camera_init()
 threshold = calibrate_threshold()
 logging.info('Threshold set to: ' + str(int(threshold)))
-logging.info('Shutter speed set to:' + str(shutter_speed))
+logging.info('Shutter speed set to: ' + str(shutter_speed))
 clear_images()
 logging.info('Safe Distance set to: ' + str(safe))
 logging.info('Critical Distance set to: ' + str(critical))
