@@ -44,6 +44,8 @@ ECHO = 17
 TRIG2 = 9
 ECHO2 = 11
 
+pins = [26, 19, 13, 6, 5, 11, 12, 9, 10, 22]
+
 
 camera = picamera.PiCamera()
 def calibrate_threshold():
@@ -117,6 +119,26 @@ def startup():
     time.sleep(0.5)
 
 
+def motor_init():
+    global pwm1
+    global pwm2
+    motor1A = 23	  # Input A
+    motor1B = 24	  # Input B
+    motor1E = 18	  # PWM
+
+    motor2A = 16
+    motor2B = 20
+    motor2E = 21
+
+    GPIO.setup(motor1A, GPIO.OUT)
+    GPIO.setup(motor1B, GPIO.OUT)
+    GPIO.setup(motor1E, GPIO.OUT)
+
+    GPIO.setup(motor2A, GPIO.OUT)
+    GPIO.setup(motor2B, GPIO.OUT)
+    GPIO.setup(motor2E, GPIO.OUT)
+
+
 def motor(power1, power2):
     global pwm1
     global pwm2
@@ -139,13 +161,13 @@ def motor(power1, power2):
         fd1 = True
 
     # setup pins
-    GPIO.setup(motor1A, GPIO.OUT)
-    GPIO.setup(motor1B, GPIO.OUT)
-    GPIO.setup(motor1E, GPIO.OUT)
-
-    GPIO.setup(motor2A, GPIO.OUT)
-    GPIO.setup(motor2B, GPIO.OUT)
-    GPIO.setup(motor2E, GPIO.OUT)
+#    GPIO.setup(motor1A, GPIO.OUT)
+#    GPIO.setup(motor1B, GPIO.OUT)
+#    GPIO.setup(motor1E, GPIO.OUT)
+#
+#    GPIO.setup(motor2A, GPIO.OUT)
+#    GPIO.setup(motor2B, GPIO.OUT)
+#    GPIO.setup(motor2E, GPIO.OUT)
 
 	#motor0
 
@@ -229,15 +251,19 @@ def clear_images():
     logging.info('removed files')
 
 
+#def led_setup():
+#    global pins
+#
+#    for i in range(0, len(pins)):
+#        GPIO.setup(pins[i], GPIO.OUT)
+
+
 def leds(pos):
     '''Set led output, takes boolean list'''
-    pins = [26, 19, 13, 6, 5, 11, 12, 9, 10, 22]
+    global pins
     if len(pos) != len(pins):
         logging.error('Input the wrong size')
         return
-
-    for i in range(0, len(pins)):
-        GPIO.setup(pins[i], GPIO.OUT)
 
     for i in range(0, len(pins)):
         GPIO.output(pins[i], pos[i])
@@ -402,6 +428,8 @@ def object_detection(safe, threshold):
 
 
 gpio_open()
+motor_init()
+#led_setup()
 logging.info('Buggy system running')
 startup()
 shutter_speed = camera_init()
