@@ -207,9 +207,9 @@ def measure():
     global TRIG
     global ECHO
 
-    GPIO.output(TRIG,False)
+    GPIO.output(TRIG, False)
 
-    time.sleep(0.01)
+    time.sleep(0.1)
 
     GPIO.output(TRIG,True)
     time.sleep(0.00001)
@@ -291,6 +291,8 @@ def motor_for_time(power1, power2, time_length):
     logging.info('For: ' + str(time_length) + 's')
     time.sleep(time_length)
     motor(0, 0)
+    time.sleep(0.5)
+    logging.info('Cycle ended')
 
 
 def camera_capture():
@@ -317,7 +319,7 @@ def image_to_array(im):
 def scan(safe, critical):
     '''Rotate and record directions'''
 #    polar_array = []  # idea for dev
-    motor_for_time(-100, 0, 0.25)
+#    motor_for_time(-100, 0, 0.25)
     rotate = True
     time.sleep(1)
     while rotate is True:
