@@ -44,6 +44,14 @@ ECHO = 17
 TRIG2 = 9
 ECHO2 = 11
 
+motor1A = 23	  # Input A
+motor1B = 24	  # Input B
+motor1E = 18	  # PWM
+
+motor2A = 16
+motor2B = 20
+motor2E = 21
+
 pins = [26, 19, 13, 6, 5, 11, 12, 9, 10, 22]
 
 
@@ -81,11 +89,11 @@ def gpio_open():
     global ECHO2
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
-    GPIO.setup(TRIG,GPIO.OUT)
-    GPIO.setup(ECHO,GPIO.IN)
-    GPIO.setup(TRIG2,GPIO.OUT)
-    GPIO.setup(ECHO2,GPIO.IN)
-    pins=[26,19,13,6,5,11,12,9,10,22]
+    GPIO.setup(TRIG, GPIO.OUT)
+    GPIO.setup(ECHO, GPIO.IN)
+    GPIO.setup(TRIG2, GPIO.OUT)
+    GPIO.setup(ECHO2, GPIO.IN)
+    pins = [26, 19, 13, 6, 5, 11, 12, 9, 10, 22]
     GPIO.setup(pins, GPIO.OUT)
 
 
@@ -122,13 +130,22 @@ def startup():
 def motor_init():
     global pwm1
     global pwm2
-    motor1A = 23	  # Input A
-    motor1B = 24	  # Input B
-    motor1E = 18	  # PWM
 
-    motor2A = 16
-    motor2B = 20
-    motor2E = 21
+    global motor1A
+    global motor1B
+    global motor1E
+
+    global motor2A
+    global motor2B
+    global motor2E
+
+#    motor1A = 23	  # Input A
+#    motor1B = 24	  # Input B
+#    motor1E = 18	  # PWM
+#
+#    motor2A = 16
+#    motor2B = 20
+#    motor2E = 21
 
     GPIO.setup(motor1A, GPIO.OUT)
     GPIO.setup(motor1B, GPIO.OUT)
@@ -142,13 +159,22 @@ def motor_init():
 def motor(power1, power2):
     global pwm1
     global pwm2
-    motor1A = 23	  # Input A
-    motor1B = 24	  # Input B
-    motor1E = 18	  # PWM
 
-    motor2A = 16
-    motor2B = 20
-    motor2E = 21
+    global motor1A
+    global motor1B
+    global motor1E
+
+    global motor2A
+    global motor2B
+    global motor2E
+
+#    motor1A = 23	  # Input A
+#    motor1B = 24	  # Input B
+#    motor1E = 18	  # PWM
+#
+#    motor2A = 16
+#    motor2B = 20
+#    motor2E = 21
 
     fd1 = True
     fd0 = False
@@ -340,7 +366,8 @@ def scan(safe, critical):
             leds([False, False, False, False, False, False, True, True, True, False])
             rotate = True
         else:
-            logging.info('Safe')
+            logging.info('Safe - extra move now')
+            motor_for_time(100, -100, 0.2)
             time.sleep(0.2)
             leds([True, True, False, False, False, False, False, False, False, False])
             rotate = False
