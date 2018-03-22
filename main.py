@@ -72,8 +72,8 @@ def calibrate_threshold():
     crop = im.crop((centre - 100, height - 400, centre + 100, height))
     gray = ImageOps.grayscale(crop)
     gray_mean = ImageStat.Stat(gray).mean[0]
-    if gray_mean + 30 < 200:
-        threshold = gray_mean + 30
+    if gray_mean + 20 < 200:
+        threshold = gray_mean + 20
         leds([False, False, True, True, True, False, False, False, False, False])
     else:
         threshold = 200
