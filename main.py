@@ -354,20 +354,20 @@ def scan(safe, critical):
         dist = dist_smooth()
         logging.info('Distance = ' + str(dist))
         if dist < safe:
-            motor_for_time(100, -100, 0.2)
+            motor_for_time(100, -100, 0.4)
             logging.warning('Not safe')
             time.sleep(0.2)
             leds([False, False, False, False, False, False, False, True, True, False])
             rotate = True
         elif dist < critical:
-            motor_for_time(-100, -100, 0.2)
+            motor_for_time(-100, -100, 0.4)
             logging.warning('Critical Distance')
             time.sleep(0.2)
             leds([False, False, False, False, False, False, True, True, True, False])
             rotate = True
         else:
             logging.info('Safe - extra move now')
-            motor_for_time(100, -100, 0.2)
+            motor_for_time(100, -100, 0.4)
             time.sleep(0.2)
             leds([True, True, False, False, False, False, False, False, False, False])
             rotate = False
