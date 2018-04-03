@@ -176,7 +176,7 @@ def motor(power1, power2):
 #    motor2B = 20
 #    motor2E = 21
 
-    fd1 = True
+#    fd1 = True
     fd0 = False
     fd1 = False
 
